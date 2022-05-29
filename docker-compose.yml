@@ -1,0 +1,25 @@
+version: "3"
+services:
+  example:
+    image: docker.example.com/example
+    container_name: example-proxy-endpoint
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.example.entrypoints=http"
+      - "traefik.http.routers.example.rule=Host(`clients.example.com`)"
+      #- "traefik.http.middlewares.example-auth.basicauth.users=exampleuser:"
+      - "traefik.http.middlewares.example-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.example.middlewares=example-https-redirect"
+      - "traefik.http.routers.example-secure.entrypoints=https"
+      - "traefik.http.routers.example-secure.rule=Host(`clients.example.com`)"
+      #- "traefik.http.routers.example-secure.middlewares=example-auth"
+      - "traefik.http.routers.example-secure.tls=true"
+      - "traefik.http.routers.example-secure.tls.certresolver=http"
+      - "traefik.http.middlewares.example-secure.headers.customrequestheaders.Access-Control-Allow-Origin=*"
+      - "traefik.http.middlewares.example.headers.customresponseheaders.Access-Control-Allow-Origin=*"
+    networks:
+      - public
+networks:
+  public:
+    external: true
